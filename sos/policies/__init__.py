@@ -1,8 +1,10 @@
 from __future__ import with_statement
 
 import os
+import random
 import re
 import platform
+import string
 import time
 import fnmatch
 import tempfile
@@ -152,6 +154,8 @@ No changes will be made to system configuration.
     vendor_url = "http://www.example.com/"
     vendor_text = ""
     PATH = ""
+    name_scheme = ('legacy', 5)
+    name_scheme_string = ''
 
     _in_container = False
     _host_sysroot = '/'
@@ -218,11 +222,58 @@ No changes will be made to system configuration.
         """
         This function should return the filename of the archive without the
         extension.
+
+        It uses the name_scheme tuple to determine the filename and possibly
+        name_scheme_string for custom naming schemes.
+
+        name_scheme takes the form (type, rand_length).
+
+        type:
+            legacy - filename like 'sosreport-tux.123456-20170120185433'
+
+            friendly - filename like 'sosreport-tux-123456-2017-01-20-abcde'
+                Here -abcde is a random generated string using rand_length
+
+            custom - policy defined template using name_scheme_string
+                Example string would be 'sosreport-%(name)s-%m%d%Y' giving
+                'sosreport-tux-01-20-2017'
+
+                Usable substitutions are:
+                    name - user's name given to sos
+                    case - case ID given to sos
+                    rand - generate random character string of rand_length
+                    A valid strftime string can be included in the string
+
+        rand_length determines the length of the random string, if used.
         """
-        if self.case_id:
-            self.report_name += "." + self.case_id
-        return "sosreport-%s-%s" % (self.report_name,
-                                    time.strftime("%Y%m%d%H%M%S"))
+
+        name = None
+        case = self.case_id
+        sdate = ''
+        rand_str = ''.join(random.choice(string.lowercase)
+                           for x in range(self.name_scheme[1]))
+
+        nstr = "sosreport%(name)s%(case)s-%(date)s"
+
+        if self.report_name != 'unused':
+            name = "-" + self.report_name
+
+        if self.name_scheme[0] == 'legacy':
+            case = ("." + case if case else '')
+            sdate = '%Y%m%d%H%M%S'
+
+        if self.name_scheme[0] == 'friendly':
+            case = ("-" + case if case else '')
+            nstr += "-%(rand)s"
+            sdate = '%Y-%m-%d'
+
+        if self.name_scheme[0] == 'custom':
+            cstr = time.strftime(self.name_scheme_string)
+            return cstr % {'name': name or "", 'case': case or "",
+                           'rand': rand_str or ""}
+
+        return nstr % {'name': name or "", 'case': case or "", 'date':
+                       time.strftime(sdate), 'rand': rand_str or ""}
 
     def get_tmp_dir(self, opt_tmp_dir):
         if not opt_tmp_dir:
