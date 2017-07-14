@@ -23,8 +23,10 @@ import fnmatch
 import errno
 import shlex
 import glob
+import threading
 
 from contextlib import closing
+from collections import deque
 
 # PYCOMPAT
 import six
@@ -152,7 +154,12 @@ def sos_get_command_output(command, timeout=300, stderr=False,
                   stderr=STDOUT if stderr else PIPE,
                   bufsize=-1, env=cmd_env, close_fds=True,
                   preexec_fn=_child_prep_fn)
-        stdout, stderr = p.communicate()
+
+        reader = AsyncReader(p.stdout)
+        reader.start()
+        reader.join()
+        sout = reader.get_contents()
+
     except OSError as e:
         if e.errno == errno.ENOENT:
             return {'status': 127, 'output': ""}
@@ -164,7 +171,7 @@ def sos_get_command_output(command, timeout=300, stderr=False,
 
     return {
         'status': p.returncode,
-        'output': stdout.decode('utf-8', 'ignore')
+        'output': sout.decode('utf-8', 'ignore')
     }
 
 
@@ -235,5 +242,29 @@ class ImporterHelper(object):
                 plugins.extend(self._find_plugins_in_dir(path))
 
         return plugins
+
+
+class AsyncReader(threading.Thread):
+    '''Used to read asyncronously from the subprocess.Popen used
+    for command output collection. This allows sos to read from
+    stdout without deadlocking'''
+
+    def __init__(self, channel):
+        threading.Thread.__init__(self)
+        self.chan = channel
+        self.deque = deque()
+        self.size = 0
+
+    def run(self):
+        '''Take from stdout and add to a deque'''
+        for line in iter(self.chan.readline, ''):
+            self.deque.append(line)
+            self.size += len(line)
+            if self.size > 104857600:
+                f = self.deque.popleft()
+                self.size -= len(f)
+
+    def get_contents(self):
+        return ''.join(elem for elem in self.deque)
 
 # vim: set et ts=4 sw=4 :
