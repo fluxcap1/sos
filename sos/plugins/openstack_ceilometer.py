@@ -31,17 +31,16 @@ class OpenStackCeilometer(Plugin):
 
     def setup(self):
         # Ceilometer
-        self.limit = self.get_option("log_size")
         if self.get_option("all_logs"):
             self.add_copy_spec([
                 "/var/log/ceilometer/*",
                 "/var/log/containers/ceilometer/*"
-            ], sizelimit=self.limit)
+            ])
         else:
             self.add_copy_spec([
                 "/var/log/ceilometer/*.log",
                 "/var/log/containers/ceilometer/*.log"
-            ], sizelimit=self.limit)
+            ])
         self.add_copy_spec([
             "/etc/ceilometer/*",
             self.var_puppet_gen + "/etc/ceilometer/*"

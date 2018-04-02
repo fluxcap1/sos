@@ -30,12 +30,10 @@ class Numa(Plugin, RedHatPlugin, DebianPlugin, UbuntuPlugin):
     def setup(self):
         self.add_copy_spec([
             "/etc/numad.conf",
-            "/etc/logrotate.d/numad"
+            "/etc/logrotate.d/numad",
+            "/var/log/numad.log*"
         ])
-        self.add_copy_spec(
-            "/var/log/numad.log*",
-            sizelimit=self.get_option("log_size")
-        )
+
         self.add_cmd_output([
             "numastat",
             "numastat -m",

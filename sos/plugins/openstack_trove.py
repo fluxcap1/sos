@@ -30,17 +30,16 @@ class OpenStackTrove(Plugin):
 
     def setup(self):
 
-        self.limit = self.get_option("log_size")
         if self.get_option("all_logs"):
             self.add_copy_spec([
                 "/var/log/trove/",
                 "/var/log/containers/trove/"
-            ], sizelimit=self.limit)
+            ])
         else:
             self.add_copy_spec([
                 "/var/log/trove/*.log",
                 "/var/log/containers/trove/*.log"
-            ], sizelimit=self.limit)
+            ])
 
         self.add_copy_spec([
             '/etc/trove/',

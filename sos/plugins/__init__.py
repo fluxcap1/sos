@@ -531,13 +531,16 @@ class Plugin(object):
         """Add a file or glob but limit it to sizelimit megabytes. If fname is
         a single file the file will be tailed to meet sizelimit. If the first
         file in a glob is too large it will be tailed to meet the sizelimit.
+
+        For files that should ignore the --log-size option, use sizelimit=0
+        rather than None.
         """
 
-        if self.get_option('all_logs'):
-            sizelimit = None
+        sizelimit = (sizelimit * 1048576 if sizelimit is not None else
+                     self.get_option('log_size') * 1048576)
 
-        if sizelimit:
-            sizelimit *= 1024 * 1024  # in MB
+        if self.get_option('all_logs'):
+            sizelimit = 0
 
         if not copyspecs:
             return False

@@ -33,8 +33,6 @@ class OvirtImageIO(Plugin, RedHatPlugin):
     profiles = ('virt',)
 
     def setup(self):
-        self.limit = self.get_option('log_size')
-        all_logs = self.get_option('all_logs')
 
         # Add configuration files
         self.add_copy_spec([
@@ -42,7 +40,7 @@ class OvirtImageIO(Plugin, RedHatPlugin):
             '/etc/ovirt-imageio-proxy/ovirt-imageio-proxy.conf',
         ])
 
-        if all_logs:
+        if self.get_option('all_logs'):
             logs = ['/var/log/ovirt-imageio-proxy/image-proxy.log*',
                     '/var/log/ovirt-imageio-daemon/daemon.log*']
         else:
@@ -50,7 +48,7 @@ class OvirtImageIO(Plugin, RedHatPlugin):
                     '/var/log/ovirt-imageio-daemon/daemon.log']
 
         # Add log files
-        self.add_copy_spec(logs, sizelimit=self.limit)
+        self.add_copy_spec(logs)
 
 
 # vim: expandtab tabstop=4 shiftwidth=4

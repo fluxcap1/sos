@@ -36,7 +36,6 @@ class OvirtHostedEngine(Plugin, RedHatPlugin):
     HA_LOG_GLOB = '/var/log/ovirt-hosted-engine-ha/*.log'
 
     def setup(self):
-        self.limit = self.get_option('log_size')
 
         # Add configuration files
         # Collecting the whole directory since it may contain branding
@@ -63,10 +62,7 @@ class OvirtHostedEngine(Plugin, RedHatPlugin):
             self.add_copy_spec(all_setup_logs[0])
         # Add older ovirt-hosted-engine-setup log files only if requested
         if self.get_option('all_logs'):
-            self.add_copy_spec(
-                self.SETUP_LOG_GLOB,
-                sizelimit=self.limit
-            )
+            self.add_copy_spec(self.SETUP_LOG_GLOB)
 
         self.add_copy_spec([
             '/var/log/ovirt-hosted-engine-ha/agent.log',
@@ -74,10 +70,7 @@ class OvirtHostedEngine(Plugin, RedHatPlugin):
         ])
         # Add older ovirt-hosted-engine-ha log files only if requested
         if self.get_option('all_logs'):
-            self.add_copy_spec(
-                self.HA_LOG_GLOB,
-                sizelimit=self.limit,
-            )
+            self.add_copy_spec(self.HA_LOG_GLOB)
 
         # Add run-time status
         self.add_cmd_output([

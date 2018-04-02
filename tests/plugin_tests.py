@@ -91,6 +91,7 @@ class EnablerPlugin(Plugin):
 
 class MockOptions(object):
     all_logs = False
+    log_size = 10
 
 
 class PluginToolTests(unittest.TestCase):

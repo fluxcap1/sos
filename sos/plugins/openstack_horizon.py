@@ -31,19 +31,18 @@ class OpenStackHorizon(Plugin):
 
     def setup(self):
 
-        self.limit = self.get_option("log_size")
         if self.get_option("all_logs"):
             self.add_copy_spec([
                 "/var/log/horizon/",
                 "/var/log/containers/horizon/",
                 "/var/log/containers/httpd/horizon/"
-            ], sizelimit=self.limit)
+            ])
         else:
             self.add_copy_spec([
                 "/var/log/horizon/*.log",
                 "/var/log/containers/horizon/*.log",
                 "/var/log/containers/httpd/horizon/*log"
-            ], sizelimit=self.limit)
+            ])
 
         self.add_copy_spec([
             "/etc/openstack-dashboard/",

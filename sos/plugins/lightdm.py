@@ -32,11 +32,11 @@ class LightDm(Plugin, RedHatPlugin, DebianPlugin, UbuntuPlugin):
             "/etc/lightdm/users.conf"
         ])
         if not self.get_option("all_logs"):
-            limit = self.get_option("log_size")
-            self.add_copy_spec("/var/log/lightdm/lightdm.log", sizelimit=limit)
-            self.add_copy_spec("/var/log/lightdm/x-0-greeter.log",
-                               sizelimit=limit)
-            self.add_copy_spec("/var/log/lightdm/x-0.log", sizelimit=limit)
+            self.add_copy_spec([
+                "/var/log/lightdm/lightdm.log",
+                "/var/log/lightdm/x-0-greeter.log",
+                "/var/log/lightdm/x-0.log"
+            ])
         else:
             self.add_copy_spec("/var/log/lightdm")
 

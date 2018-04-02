@@ -25,13 +25,13 @@ class Kimchi(Plugin, RedHatPlugin, UbuntuPlugin, DebianPlugin):
     packages = ('kimchi',)
 
     def setup(self):
-        log_limit = self.get_option('log_size')
         self.add_copy_spec('/etc/kimchi/')
         if not self.get_option('all_logs'):
-            self.add_copy_spec('/var/log/kimchi/*.log', sizelimit=log_limit)
-            self.add_copy_spec('/etc/kimchi/kimchi*', sizelimit=log_limit)
-            self.add_copy_spec('/etc/kimchi/distros.d/*.json',
-                               sizelimit=log_limit)
+            self.add_copy_spec([
+                '/var/log/kimchi/*.log',
+                '/etc/kimchi/kimchi*',
+                '/etc/kimchi/distros.d/*.json'
+            ])
         else:
             self.add_copy_spec('/var/log/kimchi/')
 

@@ -45,21 +45,18 @@ class GnocchiPlugin(Plugin, RedHatPlugin):
             self.var_puppet_gen + "/etc/my.cnf.d/tripleo.cnf"
         ])
 
-        self.limit = self.get_option("log_size")
         if self.get_option("all_logs"):
             self.add_copy_spec([
                 "/var/log/gnocchi/*",
                 "/var/log/containers/gnocchi/*",
-                "/var/log/containers/httpd/gnocchi-api/*"],
-                sizelimit=self.limit
-            )
+                "/var/log/containers/httpd/gnocchi-api/*"
+            ])
         else:
             self.add_copy_spec([
                 "/var/log/gnocchi/*.log",
                 "/var/log/containers/gnocchi/*.log",
-                "/var/log/containers/httpd/gnocchi-api/*log"],
-                sizelimit=self.limit
-            )
+                "/var/log/containers/httpd/gnocchi-api/*log"
+            ])
 
         vars_all = [p in os.environ for p in [
                     'OS_USERNAME', 'OS_PASSWORD']]

@@ -27,12 +27,9 @@ class OpenDaylight(Plugin, RedHatPlugin):
     def setup(self):
         self.add_copy_spec("/opt/opendaylight/etc/")
 
-        self.limit = self.get_option("log_size")
         if self.get_option("all_logs"):
-            self.add_copy_spec("/opt/opendaylight/data/log/",
-                               sizelimit=self.limit)
+            self.add_copy_spec("/opt/opendaylight/data/log/")
         else:
-            self.add_copy_spec("/opt/opendaylight/data/log/*log",
-                               sizelimit=self.limit)
+            self.add_copy_spec("/opt/opendaylight/data/log/*log")
 
 # vim: set et ts=4 sw=4 :
