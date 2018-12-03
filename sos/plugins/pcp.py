@@ -135,7 +135,12 @@ class Pcp(Plugin, RedHatPlugin, DebianPlugin):
         ])
 
         # Need to get the current status of the PCP infrastructure
-        self.add_cmd_output("pcp")
+        self.add_cmd_output([
+            'pcp',
+            'pcp --version',
+            'pcp dstat --list',
+            'pcp dstat --time --cpu --disk --mem --page --net --sys 1s 5'
+        ])
 
 
 # vim: set et ts=4 sw=4 :
