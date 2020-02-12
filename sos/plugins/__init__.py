@@ -1505,9 +1505,17 @@ class Plugin(object):
                 self._log_debug("could not add string '%s': %s"
                                 % (file_name, e))
 
+    def _collect_services(self):
+        """Collect status information for each service defined in the Plugin's
+        `services` attr
+        """
+        for serv in self.services:
+            self.add_service_status(serv)
+
     def collect(self):
         """Collect the data for a plugin."""
         start = time()
+        self._collect_services()
         self._collect_copy_specs()
         self._collect_cmds()
         self._collect_strings()
